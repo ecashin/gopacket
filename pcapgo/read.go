@@ -117,6 +117,10 @@ func (r *Reader) readHeader() error {
 
 // ReadPacketData reads next packet from file.
 func (r *Reader) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
+	return r.ReadPacketData(nil)
+}
+
+func (r *Reader) ReadPacketData(buf []byte) (data []byte, ci gopacket.CaptureInfo, err error) {
 	if ci, err = r.readPacketHeader(); err != nil {
 		return
 	}
@@ -124,7 +128,12 @@ func (r *Reader) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err err
 		err = fmt.Errorf("capture length exceeds snap length: %d > %d", 16+ci.CaptureLength, r.snaplen)
 		return
 	}
-	data = make([]byte, ci.CaptureLength)
+	if buf == nil {
+		data = make([]byte, ci.CaptureLength)
+	} else if len(buf) < 16+ci.CaptureLength {
+		err = fmt.Errorf("capture length exceeds buffer length: %d > %d", 16+ci.CaptureLength, len(buf))
+		return
+	}
 	_, err = io.ReadFull(r.r, data)
 	return data, ci, err
 }
