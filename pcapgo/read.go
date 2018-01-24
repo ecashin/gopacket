@@ -117,10 +117,10 @@ func (r *Reader) readHeader() error {
 
 // ReadPacketData reads next packet from file.
 func (r *Reader) ReadPacketData() (data []byte, ci gopacket.CaptureInfo, err error) {
-	return r.ReadPacketData(nil)
+	return r.ReadPacketDataWithBuffer(nil)
 }
 
-func (r *Reader) ReadPacketData(buf []byte) (data []byte, ci gopacket.CaptureInfo, err error) {
+func (r *Reader) ReadPacketDataWithBuffer(buf []byte) (data []byte, ci gopacket.CaptureInfo, err error) {
 	if ci, err = r.readPacketHeader(); err != nil {
 		return
 	}
